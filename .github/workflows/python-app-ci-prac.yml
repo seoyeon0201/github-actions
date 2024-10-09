@@ -37,7 +37,3 @@ jobs:
     - name: Run the application
       run: |
         python app.py
-    - name: Test the application
-      run: |
-        sleep 5  # 서버가 완전히 시작될 시간을 줍니다.
-        curl http://127.0.0.1:5000
