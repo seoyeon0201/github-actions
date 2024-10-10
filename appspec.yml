@@ -1,0 +1,13 @@
+# appspec.yml
+
+version: 0.0
+os: ubuntu
+
+files:
+  - source: /
+    destination: /home/ubuntu/githubactions-codedeploy-bucket-deploy
+permissions:
+  - object: /home/ubuntu/githubactions-codedeploy-bucket-deploy
+    owner: ubuntu
+    group: ubuntu
+    mode: 755
