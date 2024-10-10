@@ -1,0 +1,37 @@
+name: githubactions-codedeploy
+
+on:
+  # main 브런치에 push되면 이 workflow가 실행
+  push:
+    branches: [ main ]
+
+  # 위의 trigger가 없어도 수동으로 동작 할 수 있게끔 해줌
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout release
+      uses: actions/checkout@v4
+
+    - name: archive awsbeginner
+      run: tar cvfz ./awsbeginner.tar.gz *
+
+    - name: AWS configure credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: upload to S3
+      run: aws s3 cp --region ap-northeast-2 ./awsbeginner.tar.gz s3://githuactions-codedeploy-bucket/githubactions-codedeploy-folder/
+    
+    - name: deploy with AWS codeDeploy
+      run: aws deploy create-deployment
+        --application-name githubactions-codedeploy
+        --deployment-config-name CodeDeployDefault.AllAtOnce
+        --deployment-group-name githubactions-codedeploy-group
+        --s3-location bucket=githuactions-codedeploy-bucket,bundleType=tgz,key=githubactions-codedeploy-folder/awsbeginner.tar.gz
